@@ -13,9 +13,10 @@ import java.util.logging.Logger;
  */
 public abstract class PlatformUtils {
     private static PlatformUtils instance;
-    protected Logger log = Logger.getLogger("PlatformUtils");
+    protected static Logger log = Logger.getLogger("PlatformUtils");
 
     static {
+        log.info("os.name value: " + System.getProperty("os.name"));
         if (System.getProperty("os.name").startsWith("Windows")) {
             instance = new WindowsPlatformUtils();
         } else if (System.getProperty("os.name").indexOf("Linux") != -1) {
@@ -25,6 +26,7 @@ public abstract class PlatformUtils {
         } else {
             instance = new DummyPlatformUtils();
         }
+        log.info("Using " + instance.getClass().getSimpleName());
     }
 
     protected PlatformUtils() {

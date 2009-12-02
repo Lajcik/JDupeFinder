@@ -19,6 +19,12 @@ public class App {
     private static ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            // ignore
+        }
+
         JFrame frame = new JFrame();
         ResultForm gui = new ResultForm(executor);
         frame.setTitle("JDupeFinder");

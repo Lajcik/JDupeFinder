@@ -14,9 +14,7 @@ import java.io.IOException;
  * @author michal.sienko
  */
 public class ImagePanel extends JPanel {
-    public static final int MAX_X = 150;
-    public static final int MAX_Y = 150;
-
+    // fields describing image
     private BufferedImage image;
     private int width;
     private int height;
@@ -61,9 +59,9 @@ public class ImagePanel extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
+        g.setColor(this.getBackground());
+        g.fillRect(0, 0, getWidth(), getHeight());
         if (icon != null) {
-            g.setColor(this.getBackground());
-            g.fillRect(0, 0, getWidth(), getHeight());
             icon.paintIcon(this, g, x, y);
         } else {
             g.drawImage(image, x, y, width, height, null);

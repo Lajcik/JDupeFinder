@@ -4,6 +4,7 @@ import org.jdesktop.swingx.JXErrorDialog;
 
 import javax.swing.*;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -69,7 +70,12 @@ public class FileSearchTask implements Runnable {
         progress.setMaximum(i);
         progress.setValue(0);
         progress.setString(null);
-        search(root);
+        try {
+            search(root);
+            invoke(finishedProgress);
+        } catch (InterruptedException e) {
+            SwingUtilities.invokeLater(abortProgress);
+        }
     }
 
     private int countFiles(File dir) {
@@ -80,7 +86,7 @@ public class FileSearchTask implements Runnable {
         return x;
     }
 
-    private void search(File dir) {
+    private void search(File dir) throws InterruptedException {
         File[] files = dir.listFiles();
         for (File file : files) {
             if (file.isDirectory()) {
@@ -97,12 +103,11 @@ public class FileSearchTask implements Runnable {
                     md.update(buf, 0, read);
                 }
                 byte[] digest = md.digest();
-                SwingUtilities.invokeLater(updateProgress);
+                invoke(updateProgress);
 
                 listener.addFile(file, convertToHex(digest));
                 if (Thread.interrupted()) {
-                    SwingUtilities.invokeLater(abortProgress);
-                    return;
+                    throw new InterruptedException();
                 }
             } catch (FileNotFoundException e) {
                 SwingUtilities.invokeLater(errorProgress);
@@ -119,7 +124,6 @@ public class FileSearchTask implements Runnable {
                 }
             }
         }
-        SwingUtilities.invokeLater(finishedProgress);
     }
 
     private static String convertToHex(byte[] data) {
@@ -136,6 +140,14 @@ public class FileSearchTask implements Runnable {
             } while (two_halfs++ < 1);
         }
         return buf.toString();
+    }
+
+    private void invoke(Runnable task) throws InterruptedException {
+        try {
+            SwingUtilities.invokeAndWait(task);
+        } catch (InvocationTargetException e) {
+            //
+        }
     }
 
 }

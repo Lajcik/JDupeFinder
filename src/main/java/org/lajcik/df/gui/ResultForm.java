@@ -15,6 +15,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Enumeration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -47,7 +48,6 @@ public class ResultForm implements FileLocatorListener {
         this.executor = executorObj;
         hideNonDupes.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-//                filter.setActive(hideNonDupes.isSelected());
                 if (hideNonDupes.isSelected()) {
                     resultTable.setModel(new ResultModelFilter(model));
                 } else {
@@ -115,11 +115,17 @@ public class ResultForm implements FileLocatorListener {
     }
 
     public void addFile(final File file, final String hash) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                model.addFile(file, hash);
-            }
-        });
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    model.addFile(file, hash);
+                }
+            });
+        } catch (InterruptedException e) {
+            //
+        } catch (InvocationTargetException e) {
+            //
+        }
     }
 
     public void finished() {

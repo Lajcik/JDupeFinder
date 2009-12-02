@@ -48,13 +48,11 @@ import javax.swing.event.TreeModelListener;
  * all of the event dispatching support provided by the superclass:
  * the AbstractTableModel.
  *
- * @version 1.2 10/27/98
- *
  * @author Philip Milne
  * @author Scott Violet
+ * @version 1.2 10/27/98
  */
-public class TreeTableModelAdapter extends AbstractTableModel
-{
+public class TreeTableModelAdapter extends AbstractTableModel {
     JTree tree;
     TreeTableModel treeTableModel;
 
@@ -66,10 +64,11 @@ public class TreeTableModelAdapter extends AbstractTableModel
             // Don't use fireTableRowsInserted() here; the selection model
             // would get updated twice.
             public void treeExpanded(TreeExpansionEvent event) {
-              fireTableDataChanged();
+                fireTableDataChanged();
             }
+
             public void treeCollapsed(TreeExpansionEvent event) {
-              fireTableDataChanged();
+                fireTableDataChanged();
             }
         });
 
@@ -124,7 +123,7 @@ public class TreeTableModelAdapter extends AbstractTableModel
     }
 
     public boolean isCellEditable(int row, int column) {
-         return treeTableModel.isCellEditable(nodeForRow(row), column);
+        return treeTableModel.isCellEditable(nodeForRow(row), column);
     }
 
     public void setValueAt(Object value, int row, int column) {
@@ -136,11 +135,15 @@ public class TreeTableModelAdapter extends AbstractTableModel
      * processed. SwingUtilities.invokeLater is used to handle this.
      */
     protected void delayedFireTableDataChanged() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                fireTableDataChanged();
-            }
-        });
+        if (SwingUtilities.isEventDispatchThread()) {
+            fireTableDataChanged();
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    fireTableDataChanged();
+                }
+            });
+        }
     }
 }
 

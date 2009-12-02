@@ -8,6 +8,7 @@
     <artifactId>JDupeFinder</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
+    <name>JDupeFinder</name>
 
     <dependencies>
         <dependency>
