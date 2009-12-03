@@ -10,6 +10,35 @@
     <packaging>jar</packaging>
     <name>JDupeFinder</name>
 
+    <!-- For the Launch4J plugin -->
+    <repositories>
+        <repository>
+            <id>akathist-repository</id>
+            <name>Akathist Repository</name>
+            <url>http://www.9stmaryrd.com/maven</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>akathist-repository</id>
+            <name>Akathist Repository</name>
+            <url>http://www.9stmaryrd.com/maven</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>evolvis-release-repository</id>
+            <name>evolvis.org release repository</name>
+            <url>http://maven-repo.evolvis.org/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <properties>
+       <cleesh.mainclass>org.lajcik.df.App</cleesh.mainclass>
+    </properties>
+
+
     <dependencies>
         <dependency>
             <groupId>com.intellij</groupId>
@@ -28,29 +57,7 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                      <manifest>
-                          <mainClass>org.lajcik.df.App</mainClass>
-                      </manifest>
-                    </archive>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
+            <!-- Compilation of IntelliJ GUI Designer .form files -->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
@@ -83,6 +90,163 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <!-- Jar -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>${cleesh.mainclass}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Packaging a windows .exe file -->
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>l4j-clui</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>gui</headerType>
+                            <outfile>target/JDupeFinder-${version}.exe</outfile>
+                            <jar>target/JDupeFinder-${version}-jar-with-dependencies.jar</jar>
+                            <errTitle>JDupeFinder</errTitle>
+                            <classPath>
+                                <mainClass>${cleesh.mainclass}</mainClass>
+                                <addDependencies>false</addDependencies>
+                                <preCp>anything</preCp>
+                            </classPath>
+                            <jre>
+                                <minVersion>1.5.0</minVersion>
+                            </jre>
+                            <versionInfo>
+                                <fileVersion>${version}.0.0</fileVersion>
+                                <txtFileVersion>txt file version?</txtFileVersion>
+                                <fileDescription>a description</fileDescription>
+                                <copyright>my copyright</copyright>
+                                <productVersion>${version}.0.0</productVersion>
+                                <txtProductVersion>txt product version</txtProductVersion>
+                                <productName>${name}</productName>
+                                <internalName>JDupeFinder-${version}</internalName>
+                                <originalFilename>JDupeFinder-${version}.exe</originalFilename>
+                            </versionInfo>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Packaging a Mac OSX bundle -->
+            <!--
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>osxappbundle-maven-plugin</artifactId>
+                            <version>1.0-alpha-1</version>
+                            <configuration>
+                                <mainClass>${cleesh.mainclass}</mainClass>
+                                <javaApplicationStub>${basedir}/src/main/app-resources/JavaApplicationStub</javaApplicationStub>
+                            </configuration>
+                            <executions>
+                                <execution>
+                                    <phase>package</phase>
+                                    <goals>
+                                        <goal>bundle</goal>
+                                    </goals>
+                                </execution>
+                           </executions>
+                       </plugin>
+            -->
+
+
+            <!--
+            <plugin>
+                <groupId>de.tarent.maven.plugins</groupId>
+                <artifactId>maven-pkg-plugin</artifactId>
+                <version>2.0.0</version>
+                <executions>
+                    <execution>
+                        <id>pkg</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>pkg</goal>
+                        </goals>
+                        <configuration>
+
+                            <defaultDistro>izpack</defaultDistro>
+
+                            <defaults>
+                                <section>app-utilities</section>
+                                <mainClass>${cleesh.mainclass}</mainClass>
+                                <maxJavaMemory>256m</maxJavaMemory>
+                                &lt;!&ndash;<bundleDependencies>true</bundleDependencies>&ndash;&gt;
+                                <advancedStarter>true</advancedStarter>
+
+                                &lt;!&ndash; For historical reason we put our stuff in src/main/pkg &ndash;&gt;
+                                <srcAuxFilesDir>src/main/pkg</srcAuxFilesDir>
+
+                                <systemProperties>
+                                    <property>
+                                        <name>de.tarent.commons.config.bootstrap.variant</name>
+                                        <value>kaliko</value>
+                                    </property>
+                                    <property>
+                                        <name>de.tarent.commons.config.file.dir</name>
+                                        &lt;!&ndash; What follows is a variable substituted by IzPack denoting the configuration file directory. &ndash;&gt;
+                                        <value>%{INSTALL_PATH}/config</value>
+                                    </property>
+                                </systemProperties>
+                            </defaults>
+
+                            <distroConfigurations>
+                                <distroConfiguration>
+
+                                    <distros>
+                                        <distro>debian_etch</distro>
+                                        <distro>debian_lenny</distro>
+                                    </distros>
+
+                                    <datarootFiles>
+                                        &lt;!&ndash; create desktop entry (by copying .desktop-file to /usr/share/applications)&ndash;&gt;
+                                        <datarootFile>
+                                            <from>kaliko.desktop</from>
+                                            <to>applications</to>
+                                        </datarootFile>
+
+                                        &lt;!&ndash; copy icons to /usr/share/icons/hicolor/apps/_resolution_/apps/ &ndash;&gt;
+                                        <datarootFile>
+                                            <from>icons/16x16/kaliko.png</from>
+                                            <to>icons/hicolor/16x16/apps/</to>
+                                        </datarootFile>
+                                    </datarootFiles>
+
+                                </distroConfiguration>
+                            </distroConfigurations>
+
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+-->
+
         </plugins>
     </build>
 </project>

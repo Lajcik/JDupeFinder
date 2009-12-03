@@ -200,13 +200,13 @@
               <stringPainted value="true"/>
             </properties>
           </component>
-          <component id="9c078" class="javax.swing.JToggleButton" binding="hideNonDupes">
+          <component id="9c078" class="javax.swing.JToggleButton" binding="showAllButton">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <selected value="false"/>
-              <text value="Hide non-duplicates"/>
+              <text value="Show all results"/>
             </properties>
           </component>
         </children>

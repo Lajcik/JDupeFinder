@@ -7,11 +7,9 @@ import org.lajcik.df.service.FileLocatorListener;
 import org.lajcik.df.service.FileSearchTask;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -36,7 +34,7 @@ public class ResultForm implements FileLocatorListener {
     private JButton newSearchButton;
     private JButton deleteSelectedButton;
     private JProgressBar progressBar;
-    private JToggleButton hideNonDupes;
+    private JToggleButton showAllButton;
 
     private ResultModel model;
 
@@ -46,12 +44,12 @@ public class ResultForm implements FileLocatorListener {
 
     public ResultForm(ExecutorService executorObj) {
         this.executor = executorObj;
-        hideNonDupes.addActionListener(new ActionListener() {
+        showAllButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (hideNonDupes.isSelected()) {
-                    resultTable.setModel(new ResultModelFilter(model));
-                } else {
+                if (showAllButton.isSelected()) {
                     resultTable.setModel(model);
+                } else {
+                    resultTable.setModel(new ResultModelFilter(model));
                 }
             }
         });
@@ -135,7 +133,7 @@ public class ResultForm implements FileLocatorListener {
 
     private void createUIComponents() {
         model = new ResultModel();
-        resultTable = new JTreeTable(model);
+        resultTable = new JTreeTable(new ResultModelFilter(model));
         resultTable.setRootVisible(false);
         resultTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         resultTable.getTree().setCellRenderer(new PlatformTreeCellRenderer());

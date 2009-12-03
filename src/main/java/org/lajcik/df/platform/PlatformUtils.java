@@ -51,7 +51,7 @@ public abstract class PlatformUtils {
     }
 
     public Icon getLargeIcon(File file) {
-        ShellFolder shellFolder = null;
+        ShellFolder shellFolder;
         try {
             shellFolder = ShellFolder.getShellFolder(file);
             return new ImageIcon(shellFolder.getIcon(true));
